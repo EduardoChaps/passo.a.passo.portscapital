@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Assinatura Digital - Gov.br</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 150px;
+            max-height: 150px;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        
+        .browser-mockup {
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            background: white;
+            height: 400px; /* Fixed height for consistency */
+            display: flex;
+            flex-direction: column;
+        }
+        .browser-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .browser-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .browser-content {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-slate-900 text-white shadow-md flex-none z-10">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 bg-amber-500 rounded flex items-center justify-center text-slate-900 font-bold">P</div>
+                <h1 class="text-lg font-bold">Guia de Assinatura Digital <span class="text-slate-400 font-normal">| Gov.br</span></h1>
+            </div>
+            <div class="text-xs text-slate-300 hidden sm:block">
+                Validade Jurídica: Lei 14.063/2020
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 sm:p-6" id="main-container">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <aside class="lg:col-span-4 space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 text-center">
+                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">Progresso do Tutorial</h2>
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    <p class="text-xl font-bold text-slate-800 mt-2" id="step-counter">Passo 1 de 6</p>
+                    <p class="text-xs text-slate-400">Siga as instruções para assinar seu contrato.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="text-amber-500">⚠</span> Pré-requisitos
+                    </h3>
+                    <div class="space-y-3">
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <input type="checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                            <span class="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">Tenho conta <strong>Gov.br</strong> (Prata ou Ouro).</span>
+                        </label>
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <input type="checkbox" class="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500">
+                            <span class="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">Tenho o arquivo <strong>PDF</strong> do contrato salvo.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                    <h3 class="font-bold text-blue-900 text-sm mb-2">Já assinou?</h3>
+                    <p class="text-xs text-blue-700 mb-3">Valide a autenticidade do documento a qualquer momento.</p>
+                    <a href="https://verificador.iti.gov.br/" target="_blank" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                        Acessar Verificador ITI ➜
+                    </a>
+                </div>
+            </aside>
+
+            <section class="lg:col-span-8">
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full min-h-[600px]">
+                    
+                    <div class="bg-slate-50 border-b border-slate-200 p-6 flex justify-between items-center">
+                        <h2 class="text-xl font-bold text-slate-800" id="step-title">1. Acessar o Portal</h2>
+                        <div class="flex gap-2">
+                            <button id="btn-prev" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-500 bg-white border border-slate-300 hover:bg-slate-50 disabled:opacity-50 transition-all">
+                                Anterior
+                            </button>
+                            <button id="btn-next" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg transition-all">
+                                Próximo ➜
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2">
+                        
+                        <div class="p-8 border-r border-slate-100 flex flex-col justify-center">
+                            <div id="instruction-content" class="fade-enter-active">
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-100 p-6 flex items-center justify-center">
+                            <div class="browser-mockup w-full max-w-xs shadow-2xl transform transition-transform duration-500 hover:scale-105">
+                                <div class="browser-header">
+                                    <div class="browser-dot bg-red-400"></div>
+                                    <div class="browser-dot bg-yellow-400"></div>
+                                    <div class="browser-dot bg-green-400"></div>
+                                    <div class="ml-2 bg-slate-100 rounded text-[8px] text-slate-400 px-2 py-0.5 w-full text-center font-mono">gov.br/assinatura</div>
+                                </div>
+                                <div class="browser-content bg-white flex flex-col items-center justify-center text-center" id="visual-content">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const steps = [
+            {
+                title: "1. Acessar o Portal",
+                instruction: `
+                    <p class="mb-4 text-slate-600">Acesse o portal de assinatura eletrônica do Governo Federal.</p>
+                    <a href="https://assinador.iti.br/assinatura/index.xhtml" class="inline-block bg-blue-600 text-white px-4 py-2 rounded font-bold hover:bg-blue-700 transition-colors mb-4 text-sm">
+                        Abrir Portal ↗
+                    </a>
+                    <p class="text-sm text-slate-500">Clique no botão <strong>"Acessar o assinador"</strong> na página que abrir e faça login com seu CPF.</p>
+                `,
+                visual: `
+                    <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3">Gov</div>
+                    <div class="w-3/4 h-2 bg-slate-200 rounded mb-2"></div>
+                    <div class="w-1/2 h-2 bg-slate-200 rounded mb-6"></div>
+                    <button class="bg-blue-600 text-white text-xs px-4 py-2 rounded-full font-bold shadow-md w-full">Entrar com gov.br</button>
+                    <div class="mt-2 text-[8px] text-slate-400">Digite seu CPF e senha</div>
+                `
+            },
+            {
+                title: "2. Enviar o Arquivo",
+                instruction: `
+                    <p class="mb-4 text-slate-600">Na tela inicial do assinador:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-slate-700">
+                        <li>Clique no botão <strong>"Escolher arquivo"</strong>.</li>
+                        <li>Selecione o <strong>PDF do contrato</strong> salvo no seu dispositivo.</li>
+                        <li>Aguarde o carregamento.</li>
+                    </ol>
+                `,
+                visual: `
+                    <div class="border-2 border-dashed border-blue-300 bg-blue-50 rounded-lg p-6 w-full flex flex-col items-center justify-center h-32">
+                        <span class="text-2xl mb-1">📂</span>
+                        <span class="text-[10px] font-bold text-blue-600">Escolher arquivo</span>
+                    </div>
+                    <div class="mt-4 w-full bg-slate-100 p-2 rounded flex items-center gap-2">
+                        <div class="w-3 h-4 bg-red-500 rounded-sm"></div>
+                        <div class="w-1/2 h-1 bg-slate-300 rounded"></div>
+                    </div>
+                `
+            },
+            {
+                title: "3. Posicionar Assinatura",
+                instruction: `
+                    <p class="mb-4 text-slate-600">O contrato aparecerá na tela. Agora:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-slate-700">
+                        <li>Role até o final da página (área das assinaturas).</li>
+                        <li>Clique <strong>exatamente</strong> sobre a linha com seu nome.</li>
+                        <li>Clique no botão azul <strong>"Assinar"</strong>.</li>
+                    </ol>
+                `,
+                visual: `
+                    <div class="w-full h-full bg-slate-50 border border-slate-200 p-2 relative text-[6px] text-slate-300 text-left">
+                        <p>Contrato...</p><br><p>Cláusula...</p><br><br>
+                        <div class="border-t border-slate-400 pt-1 mt-4 text-slate-500 font-bold w-1/2">
+                            Assinatura Aqui
+                        </div>
+                        <div class="absolute bottom-10 left-4 bg-green-100 border border-green-500 text-green-700 px-2 py-1 rounded shadow-lg animate-bounce">
+                            Clique aqui!
+                        </div>
+                        <button class="absolute bottom-2 right-2 bg-blue-600 text-white text-[8px] px-2 py-1 rounded">Assinar</button>
+                    </div>
+                `
+            },
+            {
+                title: "4. Confirmar (SMS/App)",
+                instruction: `
+                    <p class="mb-4 text-slate-600">Uma janela de segurança abrirá:</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-slate-700">
+                        <li>Selecione "Carregar Certificados" (se pedir).</li>
+                        <li>Escolha o certificado "Gov.br".</li>
+                        <li>Digite o <strong>código</strong> enviado para seu celular ou App Gov.br.</li>
+                        <li>Clique em <strong>"Autorizar"</strong>.</li>
+                    </ol>
+                `,
+                visual: `
+                    <div class="bg-white border border-slate-200 shadow-xl rounded-lg p-4 w-full max-w-[180px]">
+                        <div class="text-[10px] font-bold mb-2 text-center">Autorização</div>
+                        <div class="text-[8px] text-slate-500 mb-2 text-center">Insira o código enviado por SMS/App .GOV</div>
+                        <div class="flex gap-1 justify-center mb-3">
+                            <div class="w-4 h-5 border border-slate-300 rounded"></div>
+                            <div class="w-4 h-5 border border-slate-300 rounded"></div>
+                            <div class="w-4 h-5 border border-slate-300 rounded"></div>
+                            <div class="w-4 h-5 border border-slate-300 rounded"></div>
+                        </div>
+                        <button class="w-full bg-green-600 text-white text-[8px] py-1 rounded">Autorizar</button>
+                    </div>
+                `
+            },
+            {
+                title: "5. Baixar Contrato",
+                instruction: `
+                    <p class="mb-4 text-slate-600">Sucesso! O documento foi assinado.</p>
+                    <ol class="list-decimal pl-5 space-y-2 text-sm text-slate-700">
+                        <li>Aguarde a mensagem de confirmação.</li>
+                        <li>Clique no ícone ou botão <strong>"Baixar arquivo assinado"</strong>.</li>
+                        <li>O arquivo (geralmente com final <em>_assinado.pdf</em>) será salvo.</li>
+                    </ol>
+                `,
+                visual: `
+                    <div class="flex flex-col items-center">
+                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl mb-2">✓</div>
+                        <div class="text-[10px] font-bold text-green-700 mb-4">Assinado com Sucesso!</div>
+                        <button class="flex items-center gap-1 bg-slate-800 text-white text-[8px] px-3 py-1.5 rounded hover:bg-slate-700">
+                            <span>⬇</span> Baixar Arquivo
+                        </button>
+                    </div>
+                `
+            },
+            {
+                title: "6. Enviar para Contratada",
+                instruction: `
+                    <p class="mb-4 text-slate-600">Último passo:</p>
+                    <p class="text-sm text-slate-700 mb-4">Envie o arquivo PDF que você acabou de baixar de volta para a <strong>Ports Capital</strong>.</p>
+                    <div class="bg-green-50 p-3 rounded border border-green-100 text-sm text-green-800">
+                        <strong>Dica:</strong> O arquivo contém um código hash verificável que garante a validade jurídica.
+                    </div>
+                `,
+                visual: `
+                    <div class="w-full bg-slate-50 p-3 rounded border border-slate-200">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white text-[10px]">📞</div>
+                            <div class="text-[8px] font-bold">WhatsApp / E-mail</div>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-2 rounded flex items-center gap-2">
+                            <span class="text-red-500 text-xs">📄</span>
+                            <div class="flex-1 h-1 bg-slate-200 rounded"></div>
+                            <span class="text-[8px] text-blue-500 font-bold">Enviar ➜</span>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        let currentStep = 0;
+        let chartInstance = null;
+
+        const dom = {
+            stepTitle: document.getElementById('step-title'),
+            instructionContent: document.getElementById('instruction-content'),
+            visualContent: document.getElementById('visual-content'),
+            stepCounter: document.getElementById('step-counter'),
+            btnPrev: document.getElementById('btn-prev'),
+            btnNext: document.getElementById('btn-next')
+        };
+
+        function renderStep(index) {
+            const step = steps[index];
+            
+            dom.instructionContent.style.opacity = '0';
+            dom.visualContent.style.opacity = '0';
+            
+            setTimeout(() => {
+                dom.stepTitle.innerText = step.title;
+                dom.instructionContent.innerHTML = step.instruction;
+                dom.visualContent.innerHTML = step.visual;
+                dom.stepCounter.innerText = `Passo ${index + 1} de ${steps.length}`;
+                
+                dom.instructionContent.style.opacity = '1';
+                dom.visualContent.style.opacity = '1';
+            }, 200);
+
+            dom.btnPrev.disabled = index === 0;
+            dom.btnNext.innerText = index === steps.length - 1 ? "Concluir" : "Próximo ➜";
+            
+            updateChart(index + 1);
+        }
+
+        dom.btnPrev.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                renderStep(currentStep);
+            }
+        });
+
+        dom.btnNext.addEventListener('click', () => {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                renderStep(currentStep);
+            } else {
+                alert("Parabéns! Você concluiu o guia. Agora é só enviar o contrato.");
+            }
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Concluído', 'Pendente'],
+                    datasets: [{
+                        data: [1, 5],
+                        backgroundColor: ['#1351b4', '#e2e8f0'], // Gov Blue, Slate 200
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+        function updateChart(stepNumber) {
+            if (chartInstance) {
+                chartInstance.data.datasets[0].data = [stepNumber, 6 - stepNumber];
+                
+                // Color shift for completion
+                if (stepNumber === 6) {
+                    chartInstance.data.datasets[0].backgroundColor = ['#16a34a', '#e2e8f0']; // Green on finish
+                } else {
+                    chartInstance.data.datasets[0].backgroundColor = ['#1351b4', '#e2e8f0'];
+                }
+                
+                chartInstance.update();
+            }
+        }
+
+        initChart();
+        renderStep(0);
+
+    </script>
+</body>
+</html>
